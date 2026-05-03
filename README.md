@@ -1,2 +1,118 @@
-# Douyin-Anti-Pause
-阻止抖音网页端长时间无操作自动暂停的问题，支持直播和视频后台播放
+# 🎬 Douyin Background Play Fix
+
+修复抖音网页端在**后台或长时间无操作时自动暂停播放**的问题。  
+支持直播和普通视频页面。
+
+---
+
+## ✨ 功能
+
+- 🚫 阻止“长时间无操作自动暂停”
+- ▶️ 保持直播 / 视频持续播放
+- 🧠 伪造页面始终处于“可见状态”
+- ⚡ 无需安装客户端，纯网页端生效
+
+---
+
+## 📦 安装方式
+
+### 方式一：油猴（推荐）
+
+1. 安装浏览器扩展：
+   - Tampermonkey（油猴）
+
+2. 点击安装脚本（GreasyFork）  
+   👉 *https://greasyfork.org/zh-CN/scripts/576472-douyin-anti-pause*
+
+---
+
+### 方式二：手动安装（不推荐 这种方式无自动更新 可能会失效）
+
+1. 新建一个 Userscript
+2. 粘贴以下代码：
+
+```javascript
+// ==UserScript==
+// @name         Douyin Background Play Fix
+// @namespace    https://greasyfork.org/
+// @version      1.0
+// @description  修复抖音网页端直播和视频在后台或长时间无操作时自动暂停的问题
+// @match        *://*.douyin.com/*
+// @run-at       document-start
+// @license      MIT
+// ==/UserScript==
+
+(function() {
+    'use strict';
+
+    Object.defineProperty(document, "hidden", {
+        get: () => false
+    });
+
+    Object.defineProperty(document, "visibilityState", {
+        get: () => "visible"
+    });
+
+    document.hasFocus = () => true;
+
+    const origPause = HTMLVideoElement.prototype.pause;
+    HTMLVideoElement.prototype.pause = function(...args) {
+        console.log("blocked pause");
+        return;
+    };
+
+})();
+````
+
+---
+
+## ⚙️ 实现原理（简要）
+
+抖音网页端会通过以下方式判断用户是否“活跃”：
+
+* `document.visibilityState`
+* `document.hidden`
+* `document.hasFocus()`
+
+当页面处于后台时：
+👉 触发定时器 → 自动暂停播放
+
+本脚本通过：
+
+* 伪造页面始终为“可见”
+* 拦截 `video.pause()`
+
+从而阻止该逻辑生效。
+
+---
+
+## ⚠️ 注意事项
+
+* 本脚本会拦截网页主动触发的 `video.pause()`
+* 在某些情况下：
+
+  * 你手动点击暂停可能也会被影响
+
+---
+
+## 🔄 可能的失效情况
+
+如果抖音更新前端逻辑，可能出现失效，例如：
+
+* 使用自定义播放器替代 `HTMLVideoElement`
+* 增加额外检测逻辑
+
+---
+
+
+## 📄 License
+
+MIT
+
+---
+
+## ⭐ 支持
+
+如果这个脚本对你有帮助，可以点个 Star 👍
+
+```
