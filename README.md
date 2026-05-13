@@ -33,34 +33,43 @@
 
 ```javascript
 // ==UserScript==
-// @name         Douyin Background Play Fix
-// @namespace    https://greasyfork.org/
-// @version      1.0
-// @description  修复抖音网页端直播和视频在后台或长时间无操作时自动暂停的问题
+// @name         Douyin Anti Pause
+// @namespace    http://tampermonkey.net/
+// @version      1.1
+// @description  阻止抖音网页端长时间无操作自动暂停
+// @match        *://www.douyin.com/*
+// @match        *://live.douyin.com/*
 // @match        *://*.douyin.com/*
 // @run-at       document-start
+// @grant        unsafeWindow
 // @license      MIT
 // ==/UserScript==
-
+ 
 (function() {
     'use strict';
-
-    Object.defineProperty(document, "hidden", {
-        get: () => false
-    });
-
-    Object.defineProperty(document, "visibilityState", {
-        get: () => "visible"
-    });
-
-    document.hasFocus = () => true;
-
-    const origPause = HTMLVideoElement.prototype.pause;
-    HTMLVideoElement.prototype.pause = function(...args) {
-        console.log("blocked pause");
-        return;
-    };
-
+ 
+    console.log("Douyin Anti Pause 已加载");
+ 
+    const docProto = Document.prototype;
+ 
+    try {
+        Object.defineProperty(docProto, 'hidden', {
+            configurable: true,
+            get: () => false
+        });
+ 
+        Object.defineProperty(docProto, 'visibilityState', {
+            configurable: true,
+            get: () => 'visible'
+        });
+ 
+        document.hasFocus = () => true;
+ 
+        console.log("visibility hook 成功");
+    } catch (e) {
+        console.error("visibility hook 失败", e);
+    }
+ 
 })();
 ````
 
